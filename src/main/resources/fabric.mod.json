@@ -17,6 +17,12 @@
 	"entrypoints": {
 		"main": [
 			"com.addie.TheFabricStargateMod"
+		],
+		"client": [
+			"com.addie.client.TheFabricStargateModClient"
+		],
+		"fabric-datagen": [
+			"com.addie.TheFabricStargateModDataGenerator"
 		]
 	},
 	"mixins": [

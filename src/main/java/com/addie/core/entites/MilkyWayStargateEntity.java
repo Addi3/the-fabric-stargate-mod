@@ -1,40 +1,90 @@
 package com.addie.core.entites;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
+import net.minecraft.entity.*;
+import net.minecraft.entity.attribute.DefaultAttributeContainer;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Arm;
 import net.minecraft.world.World;
 
-public class MilkyWayStargateEntity extends Entity {
+import java.util.Collections;
 
-    public MilkyWayStargateEntity(EntityType<? extends MilkyWayStargateEntity> type, World world) {
+public class MilkyWayStargateEntity extends LivingEntity {
+
+    public MilkyWayStargateEntity(EntityType<? extends LivingEntity> type, World world) {
         super(type, world);
+        this.setNoGravity(true);
+    }
+
+    public static DefaultAttributeContainer.Builder createAttributes() {
+        return LivingEntity.createLivingAttributes()
+                .add(EntityAttributes.GENERIC_MAX_HEALTH, 20.0);
     }
 
     @Override
     protected void initDataTracker() {
+        super.initDataTracker();
     }
 
     @Override
-    public void tick() {
-        super.tick();
+    public Iterable<ItemStack> getArmorItems() {
+        return Collections.emptyList();
     }
 
     @Override
-    protected void readCustomDataFromNbt(NbtCompound nbt) {
+    public ItemStack getEquippedStack(EquipmentSlot slot) {
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public void equipStack(EquipmentSlot slot, ItemStack stack) {}
+
+    @Override
+    public Arm getMainArm() {
+        return Arm.RIGHT;
+    }
+
+    @Override
+    public void readCustomDataFromNbt(NbtCompound nbt) {
+        super.readCustomDataFromNbt(nbt);
+
         if (nbt.contains("Yaw")) this.setYaw(nbt.getFloat("Yaw"));
         if (nbt.contains("Pitch")) this.setPitch(nbt.getFloat("Pitch"));
     }
 
     @Override
-    protected void writeCustomDataToNbt(NbtCompound nbt) {
+    public void writeCustomDataToNbt(NbtCompound nbt) {
+        super.writeCustomDataToNbt(nbt);
+
         nbt.putFloat("Yaw", this.getYaw());
         nbt.putFloat("Pitch", this.getPitch());
-        nbt.putUuid("UUID", this.getUuid());
     }
 
     @Override
     public boolean shouldRender(double distance) {
         return true;
+    }
+
+    @Override
+    public boolean isPushable() {
+        return false;
+    }
+
+    @Override
+    public boolean isCollidable() {
+        return false;
+    }
+
+    @Override
+    public void pushAwayFrom(Entity entity) {
+    }
+
+    @Override
+    public void takeKnockback(double strength, double x, double z) {
+    }
+
+    @Override
+    public void addVelocity(double x, double y, double z) {
     }
 }

@@ -1,9 +1,11 @@
 package com.addie;
 
+import com.addie.core.TheFabricStargateModEntites;
 import com.addie.core.TheFabricStargateModItems;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.minecraft.item.ItemGroups;
 
 import static com.addie.core.TheFabricStargateModItems.MILKY_WAY_GATE_PLACER;
@@ -19,5 +21,10 @@ public class TheFabricStargateMod implements ModInitializer {
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(entries -> {
 			entries.add(MILKY_WAY_GATE_PLACER);
 		});
+
+		FabricDefaultAttributeRegistry.register(
+				TheFabricStargateModEntites.MILKYWAYSTARGATE,
+				com.addie.core.entites.MilkyWayStargateEntity.createAttributes()
+		);
 	}
 }

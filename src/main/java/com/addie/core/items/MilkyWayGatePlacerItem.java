@@ -30,7 +30,7 @@ public class MilkyWayGatePlacerItem extends Item {
 
                 server.getCommandManager().executeWithPrefix(
                         source,
-                        "execute at @s run function the-fabric-stargate-mod:summon_mw_gate"
+                        "execute at @s run function the-fabric-stargate-mod:stargates/summon_mw_gate"
                 );
             }
         }

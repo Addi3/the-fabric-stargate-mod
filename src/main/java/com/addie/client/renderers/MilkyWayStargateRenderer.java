@@ -38,11 +38,12 @@ public class MilkyWayStargateRenderer extends EntityRenderer<MilkyWayStargateEnt
             VertexConsumerProvider vertexConsumers,
             int light
     ) {
-
         matrices.push();
 
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180.0F));
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0F));
+
+        float entityYaw = entity.getYaw();
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(entityYaw));
 
         VertexConsumer vertexConsumer =
                 vertexConsumers.getBuffer(RenderLayer.getEntityCutout(TEXTURE));

@@ -9,3 +9,6 @@ kill @s
 # checks for gate and gives placer item depending
 
 execute if entity @e[type=the-fabric-stargate-mod:milkyway_stargate] run summon item ~ ~ ~ {Item:{id:"the-fabric-stargate-mod:milky_way_gate_placer",Count:1b}}
+
+# Kill glyphs
+execute as @e[type=the-fabric-stargate-mod:milkyway_stargate,limit=1] run function the-fabric-stargate-mod:stargates/glyphs/kill

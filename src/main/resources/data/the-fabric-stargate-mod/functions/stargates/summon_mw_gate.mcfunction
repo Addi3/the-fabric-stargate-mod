@@ -22,4 +22,3 @@ execute as @e[type=the-fabric-stargate-mod:milkyway_stargate,sort=nearest,limit=
 # East/West Orientation
 execute as @e[type=the-fabric-stargate-mod:milkyway_stargate,sort=nearest,limit=1] at @s if data entity @s {Yaw:90.0f} run place template the-fabric-stargate-mod:ew_hitbox ~ ~ ~-3
 execute as @e[type=the-fabric-stargate-mod:milkyway_stargate,sort=nearest,limit=1] at @s if data entity @s {Yaw:-90.0f} run place template the-fabric-stargate-mod:ew_hitbox ~ ~ ~-3
-

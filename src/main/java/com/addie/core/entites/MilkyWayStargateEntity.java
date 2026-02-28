@@ -5,6 +5,9 @@ import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
 import net.minecraft.util.Arm;
 import net.minecraft.world.World;
 
@@ -12,9 +15,14 @@ import java.util.Collections;
 
 public class MilkyWayStargateEntity extends LivingEntity {
 
+    private String[] standardAddress = new String[7];
+
     public MilkyWayStargateEntity(EntityType<? extends LivingEntity> type, World world) {
         super(type, world);
         this.setNoGravity(true);
+        for (int i = 0; i < 7; i++) {
+            standardAddress[i] = "";
+        }
     }
 
     public static DefaultAttributeContainer.Builder createAttributes() {
@@ -25,6 +33,7 @@ public class MilkyWayStargateEntity extends LivingEntity {
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
+        // You could also use DataTracker here for syncing to clients
     }
 
     @Override
@@ -51,6 +60,13 @@ public class MilkyWayStargateEntity extends LivingEntity {
 
         if (nbt.contains("Yaw")) this.setYaw(nbt.getFloat("Yaw"));
         if (nbt.contains("Pitch")) this.setPitch(nbt.getFloat("Pitch"));
+
+        if (nbt.contains("StandardAddress", NbtElement.LIST_TYPE)) {
+            NbtList addressList = nbt.getList("StandardAddress", NbtElement.STRING_TYPE);
+            for (int i = 0; i < Math.min(7, addressList.size()); i++) {
+                standardAddress[i] = addressList.getString(i);
+            }
+        }
     }
 
     @Override
@@ -59,6 +75,41 @@ public class MilkyWayStargateEntity extends LivingEntity {
 
         nbt.putFloat("Yaw", this.getYaw());
         nbt.putFloat("Pitch", this.getPitch());
+
+        // Write the address to NBT
+        NbtList addressList = new NbtList();
+        for (int i = 0; i < 7; i++) {
+            if (standardAddress[i] != null) {
+                addressList.add(NbtString.of(standardAddress[i]));
+            } else {
+                addressList.add(NbtString.of(""));
+            }
+        }
+        nbt.put("StandardAddress", addressList);
+    }
+
+    public String[] getStandardAddress() {
+        return standardAddress;
+    }
+
+    public void setStandardAddress(String[] address) {
+        if (address.length == 7) {
+            this.standardAddress = address;
+        }
+    }
+
+    public void setStandardAddressChar(int index, String character) {
+        if (index >= 0 && index < 7) {
+            this.standardAddress[index] = character;
+        }
+    }
+
+    public String getStandardAddressString() {
+        StringBuilder sb = new StringBuilder();
+        for (String s : standardAddress) {
+            sb.append(s);
+        }
+        return sb.toString();
     }
 
     @Override

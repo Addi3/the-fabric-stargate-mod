@@ -1,8 +1,8 @@
-
-# TODO: add way to kill / break gate (kill entity and break barriers)
-
-# Summon targate centered on the block the player is standing on
+# Summon stargate centered on the block the player is standing on
 execute at @p align xyz run summon the-fabric-stargate-mod:milkyway_stargate ~0.5 ~ ~0.5
+
+# Generate and assign a random 7-character address to the newly spawned gate
+execute as @e[type=the-fabric-stargate-mod:milkyway_stargate,sort=nearest,limit=1] run function the-fabric-stargate-mod:stargates/addresses/standard/assign_address
 
 # No North cus of default spawn rotation
 
@@ -22,3 +22,4 @@ execute as @e[type=the-fabric-stargate-mod:milkyway_stargate,sort=nearest,limit=
 # East/West Orientation
 execute as @e[type=the-fabric-stargate-mod:milkyway_stargate,sort=nearest,limit=1] at @s if data entity @s {Yaw:90.0f} run place template the-fabric-stargate-mod:ew_hitbox ~ ~ ~-3
 execute as @e[type=the-fabric-stargate-mod:milkyway_stargate,sort=nearest,limit=1] at @s if data entity @s {Yaw:-90.0f} run place template the-fabric-stargate-mod:ew_hitbox ~ ~ ~-3
+

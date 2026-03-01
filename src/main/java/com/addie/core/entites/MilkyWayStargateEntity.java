@@ -9,6 +9,7 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.util.Arm;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 import java.util.Collections;
@@ -16,6 +17,7 @@ import java.util.Collections;
 public class MilkyWayStargateEntity extends LivingEntity {
 
     private String[] standardAddress = new String[7];
+    private Identifier dimensionOrigin;
 
     public MilkyWayStargateEntity(EntityType<? extends LivingEntity> type, World world) {
         super(type, world);
@@ -23,6 +25,7 @@ public class MilkyWayStargateEntity extends LivingEntity {
         for (int i = 0; i < 7; i++) {
             standardAddress[i] = "";
         }
+        this.dimensionOrigin = world.getRegistryKey().getValue();
     }
 
     public static DefaultAttributeContainer.Builder createAttributes() {
@@ -33,7 +36,6 @@ public class MilkyWayStargateEntity extends LivingEntity {
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
-        // You could also use DataTracker here for syncing to clients
     }
 
     @Override
@@ -67,6 +69,10 @@ public class MilkyWayStargateEntity extends LivingEntity {
                 standardAddress[i] = addressList.getString(i);
             }
         }
+
+        if (nbt.contains("DimensionOrigin", NbtElement.STRING_TYPE)) {
+            this.dimensionOrigin = Identifier.tryParse(nbt.getString("DimensionOrigin"));
+        }
     }
 
     @Override
@@ -76,7 +82,6 @@ public class MilkyWayStargateEntity extends LivingEntity {
         nbt.putFloat("Yaw", this.getYaw());
         nbt.putFloat("Pitch", this.getPitch());
 
-        // Write the address to NBT
         NbtList addressList = new NbtList();
         for (int i = 0; i < 7; i++) {
             if (standardAddress[i] != null) {
@@ -86,6 +91,12 @@ public class MilkyWayStargateEntity extends LivingEntity {
             }
         }
         nbt.put("StandardAddress", addressList);
+
+        if (dimensionOrigin != null) {
+            nbt.putString("DimensionOrigin", dimensionOrigin.toString());
+        } else {
+            nbt.putString("DimensionOrigin", this.getWorld().getRegistryKey().getValue().toString());
+        }
     }
 
     public String[] getStandardAddress() {
@@ -110,6 +121,18 @@ public class MilkyWayStargateEntity extends LivingEntity {
             sb.append(s);
         }
         return sb.toString();
+    }
+
+    public Identifier getDimensionOrigin() {
+        return dimensionOrigin;
+    }
+
+    public void setDimensionOrigin(Identifier dimension) {
+        this.dimensionOrigin = dimension;
+    }
+
+    public String getDimensionOriginString() {
+        return dimensionOrigin != null ? dimensionOrigin.toString() : "unknown";
     }
 
     @Override

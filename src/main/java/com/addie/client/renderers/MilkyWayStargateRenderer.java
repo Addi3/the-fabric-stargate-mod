@@ -3,16 +3,16 @@ package com.addie.client.renderers;
 import com.addie.client.TheFabricStargateModClient;
 import com.addie.client.models.MilyWayStargateModel;
 import com.addie.core.entites.MilkyWayStargateEntity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
-import org.joml.Matrix3f;
-import org.joml.Matrix4f;
 
 public class MilkyWayStargateRenderer extends EntityRenderer<MilkyWayStargateEntity> {
 
@@ -22,21 +22,19 @@ public class MilkyWayStargateRenderer extends EntityRenderer<MilkyWayStargateEnt
     private static final Identifier GLYPH_FONT =
             new Identifier("the-fabric-stargate-mod", "stargate_glyphs");
 
-    private static final int GLYPH_COLOR = 0xFF2C2E3B;
+    private static final int MILKY_WAY_GLYPH_COLOR = 0xFF1d1d26;
+    private static final int MAX_GLYPHS = 36;
+
+    private static final float RADIUS = 3f;
+    private static final float GLYPH_SIZE = 0.03f;
+    private static final float Y_OFFSET = -2f;
+    private static final float Z_OFFSET = -0.24f;
 
     private static final String[] GLYPHS = {
             "7", "8", "9", "@", "(", ")", "*", ".", "/", ":", ";", "<", ">", "?",
             "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
             "O", "P", "Q", "R", "S", "T", "U", "V"
     };
-
-    private static final float RADIUS = 2.9f;
-    private static final float GLYPH_SIZE = 0.03f;
-    private static final float YAW_OFFSET = 180f;
-    private static final float PITCH_OFFSET = 90f;
-
-    private static final float BASE_X_ROTATION = 90f;
-    private static final float BASE_Z_ROTATION = 180f;
 
     private final MilyWayStargateModel model;
     private final TextRenderer textRenderer;
@@ -46,7 +44,7 @@ public class MilkyWayStargateRenderer extends EntityRenderer<MilkyWayStargateEnt
         this.model = new MilyWayStargateModel(
                 ctx.getPart(TheFabricStargateModClient.MILKY_WAY_STARGATE_LAYER)
         );
-        this.textRenderer = ctx.getTextRenderer();
+        this.textRenderer = MinecraftClient.getInstance().textRenderer;
     }
 
     @Override
@@ -81,7 +79,9 @@ public class MilkyWayStargateRenderer extends EntityRenderer<MilkyWayStargateEnt
                 1f, 1f, 1f, 1f
         );
 
-        renderGlyphs(matrices, vertexConsumers, light);
+        matrices.push();
+        renderGlyphs(matrices, vertexConsumers, light, entity);
+        matrices.pop();
 
         matrices.pop();
 
@@ -91,48 +91,41 @@ public class MilkyWayStargateRenderer extends EntityRenderer<MilkyWayStargateEnt
     private void renderGlyphs(
             MatrixStack matrices,
             VertexConsumerProvider vertexConsumers,
-            int light
+            int light,
+            MilkyWayStargateEntity entity
     ) {
-        matrices.push();
+        matrices.translate(0, Y_OFFSET, Z_OFFSET);
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90f));
 
-        matrices.translate(0, -2, -0.25);
+        int skyLight = (light >> 20) & 0xF;
 
-        if (YAW_OFFSET != 0) {
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(YAW_OFFSET));
+        int glyphLight;
+        if (skyLight >= 15) {
+            glyphLight = LightmapTextureManager.MAX_LIGHT_COORDINATE;
+        } else {
+            glyphLight = 0;
         }
 
-        if (PITCH_OFFSET != 0) {
-            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(PITCH_OFFSET));
-        }
 
-        for (int i = 0; i < GLYPHS.length; i++) {
+
+        for (int i = 0; i < MAX_GLYPHS; i++) {
             matrices.push();
 
-            float angle = i * 10f;
-            double rad = Math.toRadians(angle);
+            float angle = (float) (2 * Math.PI * i) / MAX_GLYPHS;
 
-            float x = (float)(Math.sin(rad) * RADIUS);
-            float z = (float)(Math.cos(rad) * RADIUS);
+            float x = (float) (Math.sin(angle) * RADIUS);
+            float z = (float) (Math.cos(angle) * RADIUS);
 
             matrices.translate(x, 0, z);
 
-            float outwardAngle = (float) Math.toDegrees(Math.atan2(x, z));
-
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(outwardAngle));
-
-            if (BASE_X_ROTATION != 0) {
-                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(BASE_X_ROTATION));
-            }
-            if (BASE_Z_ROTATION != 0) {
-                matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(BASE_Z_ROTATION));
-            }
-
+            float centerAngle = (float) Math.toDegrees(Math.atan2(x, z));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(centerAngle));
 
             matrices.scale(GLYPH_SIZE, GLYPH_SIZE, GLYPH_SIZE);
+            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90f));
 
-            Text glyphText = Text.literal(GLYPHS[i]).styled(style ->
-                    style.withFont(GLYPH_FONT)
-            );
+            Text glyphText = Text.literal(GLYPHS[i])
+                    .setStyle(Style.EMPTY.withFont(GLYPH_FONT));
 
             float textWidth = textRenderer.getWidth(glyphText);
             float textHeight = textRenderer.fontHeight;
@@ -141,18 +134,16 @@ public class MilkyWayStargateRenderer extends EntityRenderer<MilkyWayStargateEnt
                     glyphText,
                     -textWidth / 2f,
                     -textHeight / 2f,
-                    GLYPH_COLOR,
+                    MILKY_WAY_GLYPH_COLOR,
                     false,
                     matrices.peek().getPositionMatrix(),
                     vertexConsumers,
                     TextRenderer.TextLayerType.NORMAL,
                     0,
-                    light
+                    glyphLight
             );
 
             matrices.pop();
         }
-
-        matrices.pop();
     }
 }
